@@ -59,6 +59,9 @@ func (t UsersApi) update(c *gin.Context) {
 func (t UsersApi) insert(c *gin.Context) {
 	var v model.Users
 	_ = c.ShouldBindJSON(&v)
+	if !checkNewUser(c, &v) {
+		return
+	}
 	service.UsersService.Insert(v)
 	c.JSON(http.StatusOK, model.OkMsg("插入成功！"))
 }
@@ -68,4 +71,22 @@ func (t UsersApi) delete(c *gin.Context) {
 	_ = c.Bind(&t)
 	service.UsersService.Delete(t.Ids)
 	c.JSON(http.StatusOK, model.OkMsg("删除成功！"))
+}
+
+// 校验用户数据
+func checkNewUser(c *gin.Context, v *model.Users) bool {
+	if len(v.Password) <= 4 {
+		c.JSON(http.StatusBadRequest, model.ErrMsg("password too short"))
+		return false
+	}
+	if len(v.UserName) == 0 || len(v.Password) == 0 {
+		c.JSON(http.StatusBadRequest, model.ErrMsg("username or password can't be emptu"))
+		return false
+	}
+	list := service.UsersService.List(1, 1, &model.Users{UserName: v.UserName})
+	if list["total"].(int64) != 0 {
+		c.JSON(http.StatusBadRequest, model.ErrMsg("same username"))
+		return false
+	}
+	return true
 }

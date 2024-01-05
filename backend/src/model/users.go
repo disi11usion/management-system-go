@@ -15,15 +15,15 @@ type Users struct {
 	//
 	Gender int64 `json:"gender,omitempty" form:"gender"`
 	//
-	Password string `json:"-" form:"password"`
+	Password string `json:"password" form:"password"`
 	//
 	Phone string `json:"phone,omitempty" form:"phone"`
 	//
 	Email string `json:"email,omitempty" form:"email"`
 	//
-	CreateAt time.Time `json:"-" form:"create_at"`
+	CreatedAt time.Time `json:"-" form:"created_at"`
 	//
-	UpdateAt time.Time `json:"-" form:"update_at"`
+	UpdatedAt time.Time `json:"-" form:"updated_at"`
 	//
 	UserStatus int64 `json:"user_status,omitempty" form:"user_status"`
 	//
@@ -36,4 +36,9 @@ func OkData[T any](t T) any {
 
 func OkMsg(s string) any {
 	return gin.H{"status": s}
+}
+
+func ErrMsg(s string) any {
+	return gin.H{"error": s}
+
 }
